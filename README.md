@@ -7,7 +7,7 @@ Blender addon for exporting Panda3D "BAM" files, for Blender 3.0 and higher. Not
 To install the addon into Blender, press the green "Code" button above and choose Download ZIP. The resulting ZIP file can be installed via the Install button in the Blender addon preferences.
 
 ## Setup
-This addon is a wrapper for the "[blend2bam](https://github.com/Moguri/blend2bam)" CLI tool. You must first install that tool via the same Python installation you're using with Panda3D. After installing blend2bam with pip, you must then open the Blender addon preferences and add the full absolute path to the Panda3D Python executable.
+This addon is a wrapper for the "[blend2bam](https://github.com/Moguri/blend2bam)" CLI tool. You must first install that tool with pip in the same Python installation you're using with Panda3D. After installing blend2bam with pip, you must then open the Blender addon preferences and add the full absolute path to the Panda3D Python executable.
 
 If you installed Panda3D via the SDK, the path will likely be somewhere in C:\Panda3D-x.xx.xx-x64\python (at least on Windows)
 
