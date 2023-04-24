@@ -150,7 +150,7 @@ class ExportBAM(Operator, ExportHelper):
         default='embed',
     )
     invisible_coll: StringProperty(
-        name="Invisible Collection",
+        name="Invis. Collection",
         description="Name of a collection in Blender whose collision objects will be exported without a visible geom node (default: InvisibleCollisions)",
         default="InvisibleCollisions",
     )
