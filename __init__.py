@@ -12,7 +12,7 @@ bl_info = {
     "name": "Export Panda3D BAM",
     "description": "Exports to Panda3D BAM",
     "author": "Addon by Theanine3D. blend2bam by Moguri",
-    "version": (0, 1),
+    "version": (0, 2),
     "blender": (3, 0, 0),
     "category": "Import-Export",
     "location": "File > Export",
@@ -46,6 +46,10 @@ def display_msg_box(message="", title="Info", icon='INFO'):
     bpy.context.window_manager.popup_menu(draw, title=title, icon=icon)
 
 def writeBAM(context, filepath, selected_only, material_mode, physics_engine, pipeline, no_srgb, texture_mode, anim_mode, invisible_coll):
+    python_path = bpy.context.preferences.addons[__name__].preferences.python_path
+    if not os.path.isfile(python_path):
+        display_msg_box(message="Python executable for Panda3D not found. Please set the correct full path for it in the Blender addon preferences.", title="Info", icon='INFO')
+        return {'FINISHED'}
     blender_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
     current_filepath = bpy.data.filepath
     if current_filepath == "":
@@ -68,14 +72,20 @@ def writeBAM(context, filepath, selected_only, material_mode, physics_engine, pi
     #                 continue
     #     bpy.ops.wm.open_mainfile(filepath=current_filepath)
     #     source_file = os.path.basename(new_filepath)
-    command = [bpy.context.preferences.addons[__name__].preferences.python_path, "-m", "blend2bam", source_file, filepath, "--material-mode", material_mode, "--physics-engine", physics_engine, "--blender-dir", blender_dir, "--pipeline", pipeline, "--textures", texture_mode, "--animations", anim_mode, "--invisible-collisions-collection", invisible_coll]
+    command = [python_path, "-m", "blend2bam", source_file, filepath, "--material-mode", material_mode, "--physics-engine", physics_engine, "--blender-dir", blender_dir, "--pipeline", pipeline, "--textures", texture_mode, "--animations", anim_mode, "--invisible-collisions-collection", invisible_coll]
     if no_srgb:
         command.append("--no-srgb")
     
-    subprocess.Popen(command, shell=True)
+    try:
+        subprocess.run(command, shell=True)
+    except subprocess.CalledProcessError as e:
+        print(e.returncode)
+        print(e.output)
+        display_msg_box(message=e.returncode, title="Error", icon='ERROR')
 
     print("\nCleaning up...\n")
-    # os.remove(new_filepath)
+    # if selected_only:
+        # os.remove(new_filepath)
 
     return {'FINISHED'}
 
