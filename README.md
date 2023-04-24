@@ -15,4 +15,4 @@ If using the Anaconda distribution of Python, look in your C:\ProgramData\anacon
 ![image](https://user-images.githubusercontent.com/88953117/234090186-fd363cbc-f718-463a-8519-b8455dda9150.png)
 
 ## Known Issues
-The "Selected Only" button currently has no effect, as the feature still needs more testing.
+The "Selected Only" export option currently has no effect, as the feature still needs more testing.
