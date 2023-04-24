@@ -11,7 +11,7 @@ This addon is a wrapper for the "[blend2bam](https://github.com/Moguri/blend2bam
 
 ![image](https://user-images.githubusercontent.com/88953117/234090186-fd363cbc-f718-463a-8519-b8455dda9150.png)
 
-If you installed Panda3D via the SDK, the path will likely be somewhere in C:\Panda3D-x.xx.xx-x64\python (at least on Windows)
+If you installed Python via the Panda3D SDK, the path will likely be somewhere in C:\Panda3D-x.xx.xx-x64\python (at least on Windows)
 
 If using the Anaconda distribution of Python, look in your C:\ProgramData\anaconda folder (on Windows)
 
