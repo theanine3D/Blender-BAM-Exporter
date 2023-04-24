@@ -1,6 +1,8 @@
 # Blender-BAM-Exporter
 Blender addon for exporting Panda3D "BAM" files.
 
+![image](https://user-images.githubusercontent.com/88953117/234097061-e53c0eca-93bf-4ee5-bf7d-9b55262ab46b.png)
+
 ## Installation
 To install the addon into Blender, press the green "Code" button above and choose Download ZIP. The resulting ZIP file can be installed via the Install button in the Blender addon preferences.
 
@@ -11,3 +13,6 @@ If you installed Panda3D via the SDK, the path will likely be somewhere in C:\Pa
 If using the Anaconda distribution of Python, look in your C:\ProgramData\anaconda folder (on Windows)
 
 ![image](https://user-images.githubusercontent.com/88953117/234090186-fd363cbc-f718-463a-8519-b8455dda9150.png)
+
+## Known Issues
+The "Selected Only" button currently has no effect, as the feature still needs more testing.
