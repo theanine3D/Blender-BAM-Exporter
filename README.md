@@ -7,4 +7,6 @@ To install the addon into Blender, press the green "Code" button above and choos
 ## Setup
 This addon is a wrapper for the "[blend2bam](https://github.com/Moguri/blend2bam)" CLI tool. You must first install that tool via the same Python installation you're using with Panda3D. After installing blend2bam with pip, you must then open the Blender addon preferences and add the full absolute path to the Panda3D Python executable.
 
+If you installed Panda3D via the SDK, the path will likely be somwhere in C:\Panda3D-x.xx.xx-x64\python
+
 ![image](https://user-images.githubusercontent.com/88953117/234090186-fd363cbc-f718-463a-8519-b8455dda9150.png)
