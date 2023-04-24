@@ -16,4 +16,5 @@ If you installed Python via the Panda3D SDK, the path will likely be somewhere i
 If using the Anaconda distribution of Python, look in your C:\ProgramData\anaconda folder (on Windows)
 
 ## Known Issues
-The "Selected Only" export option currently has no effect, as the feature still needs more testing.
+- The "Selected Only" export option currently has no effect, as the feature still needs more testing.
+- The addon currently doesn't install the blend2bam dependency automatically if it's missing. This will be addressed in a future update.
