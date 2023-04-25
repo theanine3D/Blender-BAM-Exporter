@@ -17,4 +17,3 @@ If using the Anaconda distribution of Python, look in your C:\ProgramData\anacon
 
 ## Known Issues
 - The "Selected Only" export option currently has no effect, as the feature still needs more testing.
-- The addon currently doesn't install the blend2bam dependency automatically if it's missing. This will be addressed in a future update.
