@@ -12,7 +12,7 @@ bl_info = {
     "name": "Export Panda3D BAM",
     "description": "Exports to Panda3D BAM",
     "author": "Addon by Theanine3D. blend2bam by Moguri",
-    "version": (0, 2),
+    "version": (0, 3),
     "blender": (3, 0, 0),
     "category": "Import-Export",
     "location": "File > Export",
@@ -55,6 +55,20 @@ def writeBAM(context, filepath, selected_only, material_mode, physics_engine, pi
     if current_filepath == "":
         display_msg_box(message="You must first save your Blender file to your hard drive.", title="Info", icon='INFO')
         return {'FINISHED'}
+    
+    # Check for dependency first
+    check_dependency = [python_path, "-m", "pip", "list"]
+    pip_list = subprocess.run(check_dependency, shell=True, capture_output=True, text=True)
+    if "panda3d-blend2bam" not in pip_list.stdout:
+        # If blend2bam is not installed, install it with pip
+        install_dependency = [python_path, "-m", "pip", "install", "panda3d-blend2bam"]
+        try:
+            subprocess.run(install_dependency, shell=True)
+        except subprocess.CalledProcessError as e:
+            print(e.returncode)
+            print(e.output)
+            display_msg_box(message=e.returncode, title="Error", icon='ERROR')
+
     current_dir = os.path.dirname(current_filepath)
     current_filename = os.path.basename(current_filepath)
     source_file = bpy.data.filepath
