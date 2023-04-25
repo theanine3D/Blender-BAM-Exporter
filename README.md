@@ -1,5 +1,5 @@
 # Blender-BAM-Exporter
-Addon for Blender (3.x+) for exporting Panda3D "BAM" files. Uses the [blend2map](https://github.com/Moguri/blend2bam) tool as backend. Not related to the [older addon](https://github.com/tobspr/Panda3D-Bam-Exporter) for Blender 2.7x.
+Addon for Blender (3.x+) for exporting Panda3D "BAM" files. Uses the [blend2bam](https://github.com/Moguri/blend2bam) tool as backend. Not related to the [older addon](https://github.com/tobspr/Panda3D-Bam-Exporter) for Blender 2.7x.
 
 ![image](https://user-images.githubusercontent.com/88953117/234097061-e53c0eca-93bf-4ee5-bf7d-9b55262ab46b.png)
 
