@@ -12,7 +12,7 @@ bl_info = {
     "name": "Export Panda3D BAM",
     "description": "Exports to Panda3D BAM",
     "author": "Addon by Theanine3D. blend2bam by Moguri",
-    "version": (0, 3),
+    "version": (0, 4),
     "blender": (3, 0, 0),
     "category": "Import-Export",
     "location": "File > Export",
@@ -39,13 +39,14 @@ def display_msg_box(message="", title="Info", icon='INFO'):
     ''' display_msg_box("This is a message", "This is a custom title", "ERROR") '''
 
     def draw(self, context):
-        lines = message.split("\n")
+        lines = str(message).split("\n")
         for line in lines:
             self.layout.label(text=line)
 
     bpy.context.window_manager.popup_menu(draw, title=title, icon=icon)
 
 def writeBAM(context, filepath, selected_only, material_mode, physics_engine, pipeline, no_srgb, texture_mode, anim_mode, invisible_coll):
+    proc = None
     python_path = bpy.context.preferences.addons[__name__].preferences.python_path
     if not os.path.isfile(python_path):
         display_msg_box(message="Python executable for Panda3D not found. Please set the correct full path for it in the Blender addon preferences.", title="Info", icon='INFO')
@@ -58,16 +59,27 @@ def writeBAM(context, filepath, selected_only, material_mode, physics_engine, pi
     
     # Check for dependency first
     check_dependency = [python_path, "-m", "pip", "list"]
-    pip_list = subprocess.run(check_dependency, shell=True, capture_output=True, text=True)
-    if "panda3d-blend2bam" not in pip_list.stdout:
+    pip_list = subprocess.check_output(check_dependency, shell=False, text=True)
+    if "panda3d-blend2bam" not in pip_list:
+        print("\nDependency 'panda3d-blend2bam' not found. Installing...\n")
         # If blend2bam is not installed, install it with pip
         install_dependency = [python_path, "-m", "pip", "install", "panda3d-blend2bam"]
         try:
-            subprocess.run(install_dependency, shell=True)
+            proc = subprocess.Popen(install_dependency, shell=False)
+            display_msg_box(message="Python dependency 'blend2bam' was installed. Please try to export again.", title="Info", icon='INFO')
         except subprocess.CalledProcessError as e:
             print(e.returncode)
             print(e.output)
-            display_msg_box(message=e.returncode, title="Error", icon='ERROR')
+            display_msg_box(message=e.output, title="Error", icon='ERROR')
+        try:
+            outs, errs = proc.communicate(timeout=6)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            outs, errs = proc.communicate()
+            print(e.output)
+            display_msg_box(message="Attempted to install Python dependency, but operation timed out.", title="Error", icon='ERROR')
+        finally:
+            return {'FINISHED'}
 
     current_dir = os.path.dirname(current_filepath)
     current_filename = os.path.basename(current_filepath)
@@ -86,16 +98,31 @@ def writeBAM(context, filepath, selected_only, material_mode, physics_engine, pi
     #                 continue
     #     bpy.ops.wm.open_mainfile(filepath=current_filepath)
     #     source_file = os.path.basename(new_filepath)
-    command = [python_path, "-m", "blend2bam", source_file, filepath, "--material-mode", material_mode, "--physics-engine", physics_engine, "--blender-dir", blender_dir, "--pipeline", pipeline, "--textures", texture_mode, "--animations", anim_mode, "--invisible-collisions-collection", invisible_coll]
+
+    # Normalize file paths
+    filepath = str(filepath).replace("\\","/").replace("//","/")
+    python_path = str(python_path).replace("\\","/").replace("//","/")
+    source_file = str(source_file).replace("\\","/").replace("//","/")
+    blender_dir = blender_dir.replace("\\","/").replace("//","/")
+
+    command = [python_path, "-m", "blend2bam", source_file, filepath, "--material-mode", material_mode, "--physics-engine", physics_engine, "--pipeline", pipeline, "--textures", texture_mode, "--animations", anim_mode, "--invisible-collisions-collection", invisible_coll, "--blender-dir", blender_dir,]
     if no_srgb:
         command.append("--no-srgb")
     
     try:
-        subprocess.run(command, shell=True)
+        print("\nAttempting BAM export...\n")
+        proc = subprocess.run(command, timeout=10, stdout=subprocess.PIPE, stderr=True, text=True)
     except subprocess.CalledProcessError as e:
         print(e.returncode)
         print(e.output)
-        display_msg_box(message=e.returncode, title="Error", icon='ERROR')
+        display_msg_box(message=e.output, title="Error", icon='ERROR')
+    except subprocess.TimeoutExpired as e:
+        print(e.output)
+        display_msg_box(message="Attempted to export, but reached a time out.", title="Error", icon='ERROR')
+
+    if not os.path.isfile(filepath):
+        print("\nFailed to export BAM.\n")
+        display_msg_box(message="Failed to export BAM. See console.", title="Info", icon='INFO')
 
     print("\nCleaning up...\n")
     # if selected_only:
