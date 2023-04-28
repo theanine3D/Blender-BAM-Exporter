@@ -12,7 +12,7 @@ bl_info = {
     "name": "Export Panda3D BAM",
     "description": "Exports to Panda3D BAM",
     "author": "Addon by Theanine3D. blend2bam by Moguri",
-    "version": (0, 4),
+    "version": (0, 41),
     "blender": (3, 0, 0),
     "category": "Import-Export",
     "location": "File > Export",
@@ -58,27 +58,32 @@ def writeBAM(context, filepath, selected_only, material_mode, physics_engine, pi
         return {'FINISHED'}
     
     # Check for dependency first
-    check_dependency = [python_path, "-m", "pip", "list"]
-    pip_list = subprocess.check_output(check_dependency, shell=False, text=True)
-    if "panda3d-blend2bam" not in pip_list:
+    def get_dependencies():
+        check_dependency = [python_path, "-m", "pip", "list"]
+        pip_list = subprocess.check_output(check_dependency, shell=False, text=True)
+        return pip_list
+    if "panda3d-blend2bam" not in get_dependencies():
         print("\nDependency 'panda3d-blend2bam' not found. Installing...\n")
+        display_msg_box(message="Dependency 'panda3d-blend2bam' not found. Installing it now, this might take a moment. Please be patient...", title="Info", icon='INFO')
         # If blend2bam is not installed, install it with pip
         install_dependency = [python_path, "-m", "pip", "install", "panda3d-blend2bam"]
         try:
-            proc = subprocess.Popen(install_dependency, shell=False)
-            display_msg_box(message="Python dependency 'blend2bam' was installed. Please try to export again.", title="Info", icon='INFO')
+            proc = subprocess.run(install_dependency, shell=False, timeout=20)
         except subprocess.CalledProcessError as e:
             print(e.returncode)
             print(e.output)
             display_msg_box(message=e.output, title="Error", icon='ERROR')
-        try:
-            outs, errs = proc.communicate(timeout=6)
         except subprocess.TimeoutExpired:
             proc.kill()
-            outs, errs = proc.communicate()
             print(e.output)
             display_msg_box(message="Attempted to install Python dependency, but operation timed out.", title="Error", icon='ERROR')
         finally:
+            if "blend2bam" in get_dependencies():
+                display_msg_box(message="Python dependency 'panda3d-blend2bam' was successfully installed. Please try to export again.", title="Info", icon='INFO')
+                print("\nPython dependency 'blend2bam' was successfully installed. Please try to export again.\n")
+            else:
+                display_msg_box(message="Attempt to install 'panda3d-blend2bam' dependency failed. Please install it manually via pip in the command line instead.", title="Info", icon='INFO')
+                print("\nAttempt to install 'panda3d-blend2bam' dependency failed. Please install it manually via pip in the command line instead.\n")
             return {'FINISHED'}
 
     current_dir = os.path.dirname(current_filepath)
