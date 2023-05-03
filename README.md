@@ -15,4 +15,4 @@ To install the addon into Blender, press the green "Code" button above and choos
 
 ## Known Issues
 - The "Selected Only" export option currently has no effect, as the feature still needs more testing.
-- blend2bam currently requires occlusion, roughness, and metallic textures to be combined into one single "ORM" map. If you export to .BAM without an ORM map (and instead use separate O, R, and M maps in your material nodes), there will be missing texture maps in the resulting .BAM file.
+- blend2bam currently requires occlusion, roughness, and metallic textures to be combined into one single "ORM" map. If you export to .BAM without an ORM map (and instead use separate O, R, and M maps in your material nodes), there will be missing texture maps in the resulting .BAM file. See iasue [here](https://github.com/Moguri/blend2bam/issues/78).
