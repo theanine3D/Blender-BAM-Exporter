@@ -12,7 +12,7 @@ bl_info = {
     "name": "Export Panda3D BAM",
     "description": "Exports to Panda3D BAM",
     "author": "Addon by Theanine3D. blend2bam by Moguri",
-    "version": (0, 4, 1),
+    "version": (0, 4),
     "blender": (3, 0, 0),
     "category": "Import-Export",
     "location": "File > Export",
@@ -45,7 +45,7 @@ def display_msg_box(message="", title="Info", icon='INFO'):
 
     bpy.context.window_manager.popup_menu(draw, title=title, icon=icon)
 
-def writeBAM(context, filepath, selected_only, material_mode, physics_engine, pipeline, no_srgb, texture_mode, anim_mode, invisible_coll):
+def writeBAM(context, filepath, material_mode, physics_engine, pipeline, no_srgb, texture_mode, anim_mode, invisible_coll):
     proc = None
     python_path = bpy.context.preferences.addons[__name__].preferences.python_path
     if not os.path.isfile(python_path):
@@ -58,51 +58,32 @@ def writeBAM(context, filepath, selected_only, material_mode, physics_engine, pi
         return {'FINISHED'}
     
     # Check for dependency first
-    def get_dependencies():
-        check_dependency = [python_path, "-m", "pip", "list"]
-        pip_list = subprocess.check_output(check_dependency, shell=False, text=True)
-        return pip_list
-    if "panda3d-blend2bam" not in get_dependencies():
+    check_dependency = [python_path, "-m", "pip", "list"]
+    pip_list = subprocess.check_output(check_dependency, shell=False, text=True)
+    if "panda3d-blend2bam" not in pip_list:
         print("\nDependency 'panda3d-blend2bam' not found. Installing...\n")
-        display_msg_box(message="Dependency 'panda3d-blend2bam' not found. Installing it now, this might take a moment. Please be patient...", title="Info", icon='INFO')
         # If blend2bam is not installed, install it with pip
         install_dependency = [python_path, "-m", "pip", "install", "panda3d-blend2bam"]
         try:
-            proc = subprocess.run(install_dependency, shell=False, timeout=20)
+            proc = subprocess.Popen(install_dependency, shell=False)
+            display_msg_box(message="Python dependency 'blend2bam' was installed. Please try to export again.", title="Info", icon='INFO')
         except subprocess.CalledProcessError as e:
             print(e.returncode)
             print(e.output)
             display_msg_box(message=e.output, title="Error", icon='ERROR')
+        try:
+            outs, errs = proc.communicate(timeout=6)
         except subprocess.TimeoutExpired:
             proc.kill()
+            outs, errs = proc.communicate()
             print(e.output)
             display_msg_box(message="Attempted to install Python dependency, but operation timed out.", title="Error", icon='ERROR')
         finally:
-            if "blend2bam" in get_dependencies():
-                display_msg_box(message="Python dependency 'panda3d-blend2bam' was successfully installed. Please try to export again.", title="Info", icon='INFO')
-                print("\nPython dependency 'blend2bam' was successfully installed. Please try to export again.\n")
-            else:
-                display_msg_box(message="Attempt to install 'panda3d-blend2bam' dependency failed. Please install it manually via pip in the command line instead.", title="Info", icon='INFO')
-                print("\nAttempt to install 'panda3d-blend2bam' dependency failed. Please install it manually via pip in the command line instead.\n")
             return {'FINISHED'}
 
     current_dir = os.path.dirname(current_filepath)
     current_filename = os.path.basename(current_filepath)
     source_file = bpy.data.filepath
-    # if selected_only:
-    #     new_filename = os.path.splitext(current_filename)[0] + "_TMP" + os.path.splitext(current_filename)[1]
-    #     new_filepath = os.path.join(current_dir, new_filename)
-    #     selected_objects = bpy.context.selected_objects
-    #     bpy.ops.wm.save_as_mainfile(filepath=new_filepath, check_existing=False, copy=False)
-    #     for obj in bpy.context.selected_objects:
-    #         obj.select_set(False)
-    #         if obj not in selected_objects:
-    #             try:
-    #                 bpy.data.objects.remove(obj)
-    #             except:
-    #                 continue
-    #     bpy.ops.wm.open_mainfile(filepath=current_filepath)
-    #     source_file = os.path.basename(new_filepath)
 
     # Normalize file paths
     filepath = str(filepath).replace("\\","/").replace("//","/")
@@ -130,8 +111,6 @@ def writeBAM(context, filepath, selected_only, material_mode, physics_engine, pi
         display_msg_box(message="Failed to export BAM. See console.", title="Info", icon='INFO')
 
     print("\nCleaning up...\n")
-    # if selected_only:
-        # os.remove(new_filepath)
 
     return {'FINISHED'}
 
@@ -146,12 +125,6 @@ class ExportBAM(Operator, ExportHelper):
         default="*.bam",
         options={'HIDDEN'},
         maxlen=255,
-    )
-
-    selected_only: BoolProperty(
-        name="Selected Only",
-        description="Exports only the currently selected objects, instead of the whole scene",
-        default=False,
     )
     material_mode: EnumProperty(
         name="Material Mode",
@@ -212,7 +185,7 @@ class ExportBAM(Operator, ExportHelper):
     )
 
     def execute(self, context):
-        return writeBAM(context, self.filepath, self.selected_only, self.material_mode, self.physics_engine, self.pipeline, self.no_srgb, self.texture_mode, self.anim_mode, self.invisible_coll)
+        return writeBAM(context, self.filepath, self.material_mode, self.physics_engine, self.pipeline, self.no_srgb, self.texture_mode, self.anim_mode, self.invisible_coll)
 
 def menu_func_export(self, context):
     self.layout.operator(ExportBAM.bl_idname, text="Panda3D (.bam)")
