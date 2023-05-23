@@ -12,7 +12,7 @@ bl_info = {
     "name": "Export Panda3D BAM",
     "description": "Exports to Panda3D BAM",
     "author": "Addon by Theanine3D. blend2bam by Moguri",
-    "version": (0, 4),
+    "version": (0, 4, 1),
     "blender": (3, 0, 0),
     "category": "Import-Export",
     "location": "File > Export",
